@@ -35,6 +35,7 @@ import {
 	getCalendarLocationHTML,
 	getCalendarTitleHTML,
 	handleCalendarIcons,
+	getEventData,
 } from './lib/calendarMode.html';
 import {
 	getDescription,
@@ -566,6 +567,77 @@ class AtomicCalendarRevive extends LitElement {
 	}
 
 	/**
+	 * Show event summary on each day
+	 * 
+	 */
+	handleCalendarEventsPerDay(day: CalendarDay) {
+		var dayEvents = day.allEvents;
+		var dayEventsHTML: any[] = [];
+
+		dayEvents.map((event: EventClass) => {
+			const eventColor =
+				typeof event.entityConfig.color != 'undefined' ? event.entityConfig.color : this._config.defaultCalColor;
+			const finishedEventsStyle =
+				event.isFinished && this._config.dimFinishedEvents
+					? `opacity: ` + this._config.finishedEventOpacity + `; filter: ` + this._config.finishedEventFilter + `;`
+					: ``;
+
+			let dayEventSummary = html`&nbsp;`;
+
+			// is it a full day event? if so then use border instead of bullet else, use a bullet
+			if (event.isAllDayEvent) {
+				const bulletType: string = typeof event.isDeclined
+					? 'calEvent-fullday-div-declined'
+					: 'calEvent-fullday-div-accepted';
+
+				dayEventSummary = html`<div class="${bulletType}" style="background-color: ${eventColor}; color: var(--primary-text-color); ${finishedEventsStyle}">
+					<div aria-hidden="true">
+						<div class="bullet-event-title">
+							${getCalendarTitleHTML(this._config, event)}
+						</div>
+						<div class="break"></div>
+						<div class="bullet-event-loc">
+							${getCalendarLocationHTML(this._config, event)}
+						</div>
+						${this._config.calShowDescription ?
+							`<div class="calMain">
+								 ${getCalendarDescriptionHTML(this._config, event)};
+							</div>` : ''}
+					</div>
+				</div>`;
+			} else {
+				const StartTime = this._config.showHours ? event.startDateTime.format('LT') : '';
+
+				const bulletType: string = event.isDeclined ? 'bullet-event-div-declined' : 'bullet-event-div-accepted';
+
+				dayEventSummary = html`
+					<div class="calEvent-event-div" style="${finishedEventsStyle}">
+						<div class="${bulletType}" style="border-color: ${eventColor}"></div>
+						<div class="bullet-event-time">
+							${StartTime}
+						</div>
+						<div class="bullet-event-title">
+							${getCalendarTitleHTML(this._config, event)}
+						</div>
+						<div class="break"></div>
+						<div class="bullet-event-loc">
+							${getCalendarLocationHTML(this._config, event)}
+						</div>
+						${this._config.calShowDescription ?
+							`<div class="calMain">
+								${getCalendarDescriptionHTML(this._config, event)};
+							</div>` : ''}
+					</div>
+				`;
+			}
+
+			dayEventsHTML.push(dayEventSummary);
+		});
+
+		return dayEventsHTML;
+	}
+
+	/**
 	 * create calendar mode html cells
 	 *
 	 */
@@ -589,16 +661,17 @@ class AtomicCalendarRevive extends LitElement {
 			}
 			if (i < 35 || showLastRow)
 				return html`
-					${i % 7 === 0 ? html`<tr class="cal"></tr>` : ''}
+					${i % 7 === 0 ? html`<tr class="cal">` : ''}
 					<td
-						@click="${() => this.handleCalendarEventSummary(day, true)}"
-						class="cal"
+						class="cal cal--events"
 						style="${dayStyleOtherMonth}${dayStyleSat}${dayStyleSun}${dayStyleClicked} --cal-grid-color: ${this._config
 							.calGridColor}; --cal-day-color: ${this._config.calDayColor}"
 					>
-						<div class="calDay ${dayClassToday}">
+						<div class="calDay${' ' + dayClassToday}">
 							<div style="position: relative; top: 5%;">${day.date.date()}</div>
-							<div>${handleCalendarIcons(day)}</div>
+						</div>
+						<div class="calDayEvents">
+							${this.handleCalendarEventsPerDay(day)}
 						</div>
 					</td>
 					${i && i % 6 === 0 ? html`</tr>` : ''}
@@ -648,7 +721,6 @@ class AtomicCalendarRevive extends LitElement {
 					</tbody>
 				</table>
 			</div>
-			<div class="summary-div">${this.eventSummary}</div>
 		`;
 	}
 }

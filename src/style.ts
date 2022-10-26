@@ -120,6 +120,10 @@ export const styles: CSSResultGroup = css`
 			padding-left: 5px;
 		}
 
+		.calDayEvents {
+			font-size: .85em;
+		}
+
 		.event-main {
 			flex-direction: row nowrap;
 			display: inline-block;
@@ -269,24 +273,56 @@ export const styles: CSSResultGroup = css`
 			color: var(--cal-day-color);
 		}
 
+		td.cal.cal--events {
+			vertical-align: top;
+			text-align: left;
+		}
+
 		.calDay {
-			height: 38px;
+			height: 20px;
 			font-size: 95%;
 			max-width: 38px;
 			margin: auto;
+			text-align: center;
 		}
 
 		.calDay.currentDay {
 			height: 20px;
 			background-color: var(--primary-color);
 			border-radius: 50%;
-			display: inline-block;
+			display: block;
+			margin: 0 auto;
 			text-align: center;
 			white-space: nowrap;
 			width: max-content;
 			min-width: 20px;
 			line-height: 140%;
 			color: var(--text-primary-color) !important;
+		}
+
+		.calEvent-fullday-div-accepted {
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			border: 2px solid;
+			border-left: 7px solid;
+			padding: 0 4px;
+			margin: 5px 0;
+			line-height: 16px;
+		}
+
+		.calEvent-fullday-div-declined {
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			border: 1px solid;
+			padding: 0 4px;
+			margin: 5px 0;
+			height: 18px;
+			line-height: 16px;
+		}
+
+		.calEvent-event-div {
+			display: flex;
+    		align-items: center;
 		}
 
 		tr.cal {
@@ -324,14 +360,25 @@ export const styles: CSSResultGroup = css`
 			display: inline-block;
 			vertical-align: middle;
 		}
+		
+		.break {
+			flex-basis: 100%;
+			height: 0;
+		}
 
-		.bullet-event-span {
-			overflow: hidden;
+		.bullet-event-time {
 			white-space: nowrap;
 			display: inline-block;
 			vertical-align: middle;
 			margin: 0 5px;
 			text-decoration: none !important;
+		}
+
+		.bullet-event-title {
+			white-space: nowrap;
+			display: inline-block;
+			vertical-align: middle;
+			font-weight: bold;
 		}
 
 		.summary-fullday-div-accepted {

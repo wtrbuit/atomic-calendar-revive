@@ -41,7 +41,7 @@ export function handleCalendarIcons(day: CalendarDay) {
 // generate Calendar title
 export function getCalendarTitleHTML(config: atomicCardConfig, event: EventClass) {
 	const titleColor: string =
-		typeof event.entityConfig.color != 'undefined' ? event.entityConfig.color : config.eventTitleColor;
+		typeof event.entityConfig.eventTitleColor != 'undefined' ? event.entityConfig.eventTitleColor : 'var(--primary-text-color)';
 	const textDecoration: string = event.isDeclined ? 'line-through' : 'none';
 
 	if (config.disableCalEventLink || event.htmlLink === null)
@@ -107,4 +107,29 @@ export function getCalendarLocationHTML(config: atomicCardConfig, event: EventCl
 			</a>
 		`;
 	}
+}
+
+export function getEventData(config: atomicCardConfig, day: CalendarDay) {
+	const allEventsHTML: any[] = [];
+    day.allEvents.map((event: EventClass) => {
+		let desc = event.description;
+		if (isHtml(event.description)) {
+			desc = unsafeHTML(event.description);
+		}
+		if (!isHtml(event.description)) {
+			desc = html`${event.description}`;
+		}
+
+		const dayEvent = html`<div class="cal-event">
+				<div class="cal-event-main">
+					<div class="event-description" style="--description-color: ${config.descColor}; --description-size: ${config.descSize}%">
+						${desc}
+					</div>
+				</div>
+			</div>`;
+
+		allEventsHTML.push(dayEvent);
+	});
+
+	return allEventsHTML;
 }
